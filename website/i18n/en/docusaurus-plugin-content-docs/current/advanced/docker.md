@@ -10,13 +10,36 @@ description: Run 3DPrintForge with Docker and docker-compose
 
 ## Quick start
 
+Requirements: Docker Engine 20.10+ and Docker Compose v2 (`docker compose version`).
+
 ```bash
 git clone https://github.com/skynett81/3dprintforge.git
 cd 3dprintforge
-docker-compose up -d
+cp config.example.json config.json   # edit it with your printer
+docker compose up -d --build
 ```
 
-Open `https://localhost:3443` in the browser.
+The first build takes a few minutes (Node image + `npm ci`). After that:
+
+```bash
+docker compose logs -f       # follow the startup
+docker compose ps            # status and health check
+docker compose down          # stop the stack
+```
+
+Open `https://localhost:3443` in the browser (HTTP on port 3000 redirects there).
+The certificate is self-signed on first run, so the browser warns you — that is expected.
+
+:::tip Try it without a printer
+Set `BAMBU_DEMO=true` under `environment:` in `docker-compose.yml` to start with
+three simulated printers. You can click through the whole UI without hardware.
+:::
+
+:::warning config.json must exist before the first start
+`docker-compose.yml` mounts `./config.json` as a file. If it does not exist,
+Docker creates a *directory* with that name and the server refuses to start.
+Copy `config.example.json` first.
+:::
 
 ## docker-compose.yml
 
@@ -69,8 +92,9 @@ CMD ["node", "server/index.js"]
 
 | Host path | Container path | Contents |
 |-----------|---------------|---------|
-| `./data` | `/app/data` | SQLite database, configuration |
-| `./certs` | `/app/certs` | SSL certificates (optional) |
+| `./config.json` | `/app/config.json` | Printers, ports and server settings |
+| `./data` | `/app/data` | SQLite database (`dashboard.db`), uploads, library, backups |
+| `./certs` | `/app/certs` | SSL certificates (generated automatically if the folder is empty) |
 
 :::tip Persistent data
 Always mount the `./data` volume. Without this, all data will be lost when the container restarts.
@@ -81,15 +105,20 @@ Always mount the `./data` volume. Without this, all data will be lost when the c
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NODE_ENV` | `production` | Environment |
-| `PORT` | `3000` | HTTP port |
-| `HTTPS_PORT` | `3443` | HTTPS port |
-| `AUTH_SECRET` | (auto) | JWT secret — set explicitly in production |
-| `LOG_LEVEL` | `info` | Log level (debug, info, warn, error) |
+| `PORT` / `SERVER_PORT` | `3000` | HTTP port (overrides `server.port` in `config.json`) |
+| `LOG_LEVEL` | `info` | Log level (`debug`, `info`, `warn`, `error`) |
+| `REQUIRE_AUTH` | `false` | Set to `true` to require sign-in |
+| `BAMBU_AUTH_USERNAME` | — | Username when sign-in is enabled |
+| `BAMBU_AUTH_PASSWORD` | — | Password when sign-in is enabled |
+| `BAMBU_DEMO` | `false` | Start with simulated printers |
+
+The HTTPS port is set with `server.httpsPort` in `config.json` (default 3443).
 
 ## SSL certificates in Docker
 
 ### Self-generated (default)
-No configuration needed. The certificate is generated automatically and stored in `./data/certs/`.
+No configuration needed. The certificate is generated on first start and stored
+in the mounted `./certs` volume.
 
 ### Custom certificate
 ```yaml
@@ -102,21 +131,26 @@ volumes:
 
 ```bash
 # Start
-docker-compose up -d
+docker compose up -d
 
 # Stop
-docker-compose down
+docker compose down
 
 # Logs
-docker-compose logs -f
+docker compose logs -f
 
-# Update to new version
-docker-compose pull
-docker-compose up -d --build
+# Update to a new version (the image is built locally, so `git pull` fetches the code)
+git pull
+docker compose up -d --build
 
-# Backup database
-docker cp 3dprintforge:/app/data/database.db ./backup-$(date +%Y%m%d).db
+# Back up the database
+cp data/dashboard.db backup-$(date +%Y%m%d).db
 ```
+
+:::note `docker compose pull` does nothing here
+`docker-compose.yml` uses `build: .` — there is no prebuilt image to pull.
+Update with `git pull` followed by `docker compose up -d --build`.
+:::
 
 ## Health status
 

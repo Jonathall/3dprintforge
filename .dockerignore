@@ -15,3 +15,17 @@ LICENSE
 install.sh
 uninstall.sh
 docs
+
+# Local build artifacts - never needed in the image, and they make the build
+# context enormous (an Electron/Flatpak build leaves several GB behind).
+**/node_modules
+dist-electron
+frontend/dist
+website/build
+website/.docusaurus
+packaging/flatpak/build-dir
+packaging/flatpak/repo
+packaging/flatpak/.flatpak-builder
+packaging/flatpak/*.flatpak
+*.bak-*
+.github

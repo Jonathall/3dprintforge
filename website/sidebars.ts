@@ -6,7 +6,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Kom i gang',
-      items: ['getting-started/installation', 'getting-started/setup', 'getting-started/bambu-cloud'],
+      items: ['getting-started/installation', 'getting-started/setup', 'getting-started/bambu-cloud', 'getting-started/troubleshooting'],
     },
     {
       type: 'category',

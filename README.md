@@ -15,6 +15,15 @@ Created by **SkyNett81** &bull; [AGPL-3.0 License](LICENSE)
 
 ![3DPrintForge](docs/project/dashboard.png)
 
+### Screenshots
+
+All captured in demo mode (`npm run demo`) — three simulated printers, no hardware.
+
+| | |
+|---|---|
+| ![React /v2 dashboard](docs/project/v2-dashboard.png)<br>**/v2 React dashboard** — fleet overview, live jobs | ![Filament inventory](docs/project/filament-inventory.png)<br>**Filament** — spools, stock health, active filament per printer |
+| ![Model Forge](docs/project/model-forge.png)<br>**Model Forge** — 51 parametric model generators | ![Analytics](docs/project/analytics.png)<br>**Analytics** — prints, success rate, filament and server stats |
+
 ---
 
 ## Highlights
@@ -158,15 +167,34 @@ Open `https://localhost:3443` in your browser (HTTP on port 3000 redirects autom
 
 ### Option 3: Docker
 
+Requires Docker Engine 20.10+ and Docker Compose v2.
+
 ```bash
 git clone https://github.com/skynett81/3dprintforge.git
 cd 3dprintforge
-cp config.example.json config.json
-# Edit config.json with your printer details
-docker compose up -d
+cp config.example.json config.json   # edit with your printer details
+docker compose up -d --build
 ```
 
+The first build takes a few minutes. Then open `https://localhost:3443` (HTTP on
+port 3000 redirects there); the self-signed certificate warning on first run is
+expected.
+
+```bash
+docker compose logs -f    # follow the startup
+docker compose ps         # status and health check
+docker compose down       # stop the stack
+```
+
+Data persists in the mounted volumes: `config.json`, `data/` (SQLite database,
+uploads, library, backups) and `certs/`. Update with `git pull && docker compose up -d --build` —
+the image is built locally, so there is nothing to `docker compose pull`.
+
 > **Important:** `network_mode: host` is required for LAN access to printers via MQTT (port 8883) and camera streams (port 322). This is already set in `docker-compose.yml`.
+
+> **Tip:** set `BAMBU_DEMO=true` under `environment:` in `docker-compose.yml` to start with three simulated printers and no hardware.
+
+Full details: [Docker Setup](https://skynett81.github.io/3dprintforge/docs/advanced/docker).
 
 ### Option 4: One-Line Install (curl)
 
@@ -432,6 +460,10 @@ docker compose pull && docker compose up -d
 | Docker: printer not found | Ensure `network_mode: host` in docker-compose.yml |
 | Port already in use | Change `server.port` in config.json or set `SERVER_PORT` env var |
 | Dashboard blank after update | Clear browser cache (Ctrl+Shift+R) |
+| Certificate warning on first run | Expected — the server generates a self-signed cert in `certs/` |
+
+More detail, including where data lives and how to read the logs:
+**[Troubleshooting & FAQ](https://skynett81.github.io/3dprintforge/docs/getting-started/troubleshooting)**.
 
 ---
 
