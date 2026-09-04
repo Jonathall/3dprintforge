@@ -96,7 +96,7 @@ After the printer is connected, AMS status updates automatically. You can:
 
 Go to **Settings → Printer → AMS** for manual configuration.
 
-## HTTPS certificates {#https-sertifikater}
+## HTTPS certificates
 
 ### Self-signed certificate (default)
 

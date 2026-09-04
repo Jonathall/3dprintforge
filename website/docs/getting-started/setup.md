@@ -134,7 +134,7 @@ Etter at printeren er koblet til, oppdateres AMS-statusen automatisk. Du kan:
 
 Gå til **Innstillinger → Printer → AMS** for manuell konfigurasjon.
 
-## HTTPS-sertifikater {#https-sertifikater}
+## HTTPS-sertifikater
 
 ### Selvgenerert sertifikat (standard)
 

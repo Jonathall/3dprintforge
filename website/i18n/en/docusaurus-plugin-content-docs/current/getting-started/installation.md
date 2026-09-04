@@ -52,7 +52,7 @@ npm start
 Open your browser at `https://localhost:3443` (or `http://localhost:3000` which redirects).
 
 :::info Self-signed SSL certificate
-On first startup the dashboard generates a self-signed SSL certificate. The browser will show a warning — this is normal. See [HTTPS certificates](./setup#https-sertifikater) to install your own certificate.
+On first startup the dashboard generates a self-signed SSL certificate. The browser will show a warning — this is normal. See [HTTPS certificates](./setup#https-certificates) to install your own certificate.
 :::
 
 ## Docker

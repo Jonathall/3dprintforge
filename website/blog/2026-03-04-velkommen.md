@@ -7,7 +7,7 @@ tags: [guide]
 
 3DPrintForge is a self-hosted dashboard for all your 3D printers. It connects directly to your printer via MQTT and gives you full control and overview.
 
-<!-- truncate -->
+{/* truncate */}
 
 ## What can you do?
 
