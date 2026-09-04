@@ -170,7 +170,10 @@ export class PrintTracker {
     // it works whether or not a print is active.
     if (printData.ams?.ams) {
       const sig = printData.ams.ams
-        .map(u => (u.tray || []).map(t => `${t.id}:${t.tray_type || ''}:${t.tray_color || ''}`).join(','))
+        // Empty AMS slots come through as null entries in the tray array
+        // (both real firmware and the demo H2D unit do this) — skip them
+        // instead of dereferencing, or the whole update throws.
+        .map(u => (u?.tray || []).map(t => (t ? `${t.id}:${t.tray_type || ''}:${t.tray_color || ''}` : '-')).join(','))
         .join('|');
       if (sig && sig !== this._lastAmsSig) {
         this._lastAmsSig = sig;
