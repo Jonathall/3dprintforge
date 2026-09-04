@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState, type JSX } from 'react';
+import { Fragment, Suspense, lazy, useCallback, useEffect, useState, type JSX } from 'react';
 import { useAuth, useResource } from './hooks';
 import { parseHash, buildHash } from './router';
 import { api } from './api';
@@ -13,28 +13,32 @@ import { QrScanModal, QR_SCAN_SUPPORTED } from './components/QrScanModal';
 import { TigerTagModal } from './components/TigerTagModal';
 import type { AppNotification } from './types';
 import { DashboardPanel } from './panels/DashboardPanel';
-import { ProductionPanel } from './panels/ProductionPanel';
-import { FleetPanel } from './panels/FleetPanel';
-import { MaintenancePanel } from './panels/MaintenancePanel';
-import { PrintGuardPanel } from './panels/PrintGuardPanel';
-import { SlicerPanel } from './panels/SlicerPanel';
-import { InventoryPanel } from './panels/InventoryPanel';
-import { QueuePanel } from './panels/QueuePanel';
-import { SchedulerPanel } from './panels/SchedulerPanel';
-import { AnalyticsPanel } from './panels/AnalyticsPanel';
-import { CostsPanel } from './panels/CostsPanel';
-import { WastePanel } from './panels/WastePanel';
-import { ActivityPanel } from './panels/ActivityPanel';
-import { ErrorsPanel } from './panels/ErrorsPanel';
-import { AchievementsPanel } from './panels/AchievementsPanel';
-import { HardwarePanel } from './panels/HardwarePanel';
-import { LibraryPanel } from './panels/LibraryPanel';
-import { KnowledgePanel } from './panels/KnowledgePanel';
-import { HistoryPanel } from './panels/HistoryPanel';
-import { CrmPanel } from './panels/CrmPanel';
-import { SupplyPanel } from './panels/SupplyPanel';
-import { PurchasingPanel } from './panels/PurchasingPanel';
-import { SettingsPanel } from './panels/SettingsPanel';
+
+// Panels are route-level code split: only the Dashboard (the landing panel) is in
+// the initial bundle — every other panel, and the Three.js viewers they pull in,
+// is fetched on first navigation. Keeps the first paint small on slow links.
+const ProductionPanel = lazy(() => import('./panels/ProductionPanel').then((m) => ({ default: m.ProductionPanel })));
+const FleetPanel = lazy(() => import('./panels/FleetPanel').then((m) => ({ default: m.FleetPanel })));
+const MaintenancePanel = lazy(() => import('./panels/MaintenancePanel').then((m) => ({ default: m.MaintenancePanel })));
+const PrintGuardPanel = lazy(() => import('./panels/PrintGuardPanel').then((m) => ({ default: m.PrintGuardPanel })));
+const SlicerPanel = lazy(() => import('./panels/SlicerPanel').then((m) => ({ default: m.SlicerPanel })));
+const InventoryPanel = lazy(() => import('./panels/InventoryPanel').then((m) => ({ default: m.InventoryPanel })));
+const QueuePanel = lazy(() => import('./panels/QueuePanel').then((m) => ({ default: m.QueuePanel })));
+const SchedulerPanel = lazy(() => import('./panels/SchedulerPanel').then((m) => ({ default: m.SchedulerPanel })));
+const AnalyticsPanel = lazy(() => import('./panels/AnalyticsPanel').then((m) => ({ default: m.AnalyticsPanel })));
+const CostsPanel = lazy(() => import('./panels/CostsPanel').then((m) => ({ default: m.CostsPanel })));
+const WastePanel = lazy(() => import('./panels/WastePanel').then((m) => ({ default: m.WastePanel })));
+const ActivityPanel = lazy(() => import('./panels/ActivityPanel').then((m) => ({ default: m.ActivityPanel })));
+const ErrorsPanel = lazy(() => import('./panels/ErrorsPanel').then((m) => ({ default: m.ErrorsPanel })));
+const AchievementsPanel = lazy(() => import('./panels/AchievementsPanel').then((m) => ({ default: m.AchievementsPanel })));
+const HardwarePanel = lazy(() => import('./panels/HardwarePanel').then((m) => ({ default: m.HardwarePanel })));
+const LibraryPanel = lazy(() => import('./panels/LibraryPanel').then((m) => ({ default: m.LibraryPanel })));
+const KnowledgePanel = lazy(() => import('./panels/KnowledgePanel').then((m) => ({ default: m.KnowledgePanel })));
+const HistoryPanel = lazy(() => import('./panels/HistoryPanel').then((m) => ({ default: m.HistoryPanel })));
+const CrmPanel = lazy(() => import('./panels/CrmPanel').then((m) => ({ default: m.CrmPanel })));
+const SupplyPanel = lazy(() => import('./panels/SupplyPanel').then((m) => ({ default: m.SupplyPanel })));
+const PurchasingPanel = lazy(() => import('./panels/PurchasingPanel').then((m) => ({ default: m.PurchasingPanel })));
+const SettingsPanel = lazy(() => import('./panels/SettingsPanel').then((m) => ({ default: m.SettingsPanel })));
 
 type PanelId = 'dashboard' | 'production' | 'fleet' | 'slicer' | 'maintenance' | 'guard' | 'inventory' | 'queue' | 'scheduler' | 'supply' | 'purchasing' | 'analytics' | 'costs' | 'waste' | 'activity' | 'errors' | 'achievements' | 'hardware' | 'library' | 'knowledge' | 'history' | 'crm' | 'settings';
 
@@ -431,6 +435,7 @@ export function App() {
       </aside>
 
       <main className="main">
+        <Suspense fallback={<div className="muted" style={{ padding: 24 }}>{t('common.loading', 'Loading…')}</div>}>
         {panel === 'dashboard' && <DashboardPanel onNavigate={(id) => setPanel(id as PanelId)} />}
         {panel === 'production' && <ProductionPanel />}
         {panel === 'slicer' && <SlicerPanel />}
@@ -454,6 +459,7 @@ export function App() {
         {panel === 'crm' && <CrmPanel sub={route.sub} detail={route.detail} onNav={(s, d) => { window.location.hash = buildHash('crm', s, d); }} />}
         {panel === 'history' && <HistoryPanel selected={route.sub} onSelect={(id) => { window.location.hash = buildHash('history', id); }} onBack={() => { window.location.hash = buildHash('history'); }} />}
         {panel === 'settings' && <SettingsPanel />}
+        </Suspense>
       </main>
 
       {notifOpen && <NotificationCenter notifications={notifications} onClose={() => setNotifOpen(false)} />}
