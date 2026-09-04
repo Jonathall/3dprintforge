@@ -38,7 +38,9 @@
     },
     "sockjs": {
       "uuid": "^14.0.0"
-    }
+    },
+    "fast-uri": "3.1.7",
+    "qs": "6.16.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.9.2",
