@@ -21,9 +21,7 @@ jobs:
       - name: Run tests
         run: npm test
       - name: Validate language files
-        run: |
-          node -e "JSON.parse(require('fs').readFileSync('public/lang/en.json', 'utf8')); console.log('en.json OK')"
-          node -e "JSON.parse(require('fs').readFileSync('public/lang/nb.json', 'utf8')); console.log('nb.json OK')"
+        run: npm run lang:check
       - name: Validate Pterodactyl egg
         run: node -e "JSON.parse(require('fs').readFileSync('egg-3dprintforge.json', 'utf8')); console.log('egg JSON OK')"
       - name: Frontend (/v2) type-check & tests
