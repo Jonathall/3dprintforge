@@ -1158,6 +1158,14 @@ export class MoonrakerClient {
       }
     }
 
+    // Chamber temperature fallback: if no temperature_sensor provided it
+    // (e.g. QIDI Plus 5 reports chamber temp via heater_generic chamber,
+    // not a temperature_sensor), use the promoted chamber heater's reading
+    // so the control panel actually shows it.
+    if (!this.state.chamber_temper && this.state._chamber_heater) {
+      this.state.chamber_temper = Math.round(this.state._chamber_heater.temperature || 0);
+    }
+
     // All LED/neopixel/dotstar strips (dynamic names)
     for (const key of Object.keys(status)) {
       if (key.startsWith('neopixel ') || key.startsWith('led ') || key.startsWith('dotstar ')) {
