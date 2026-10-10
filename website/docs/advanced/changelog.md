@@ -26,6 +26,10 @@ code-scanning / dependency backlog was cleared.
 - **Broken-access-control fix** — sensitive GET reads (API keys, user list, database backups, notification/store secrets, remote-node and network config) are now admin-only instead of readable by any low-privilege `view` user
 - Enabled Dependabot and secret push protection; patched all dependency advisories across the server, the `/v2` frontend and the docs site to zero
 
+### Fixes
+- **Per-vendor SpoolmanDB refresh silently imported nothing** — the upsert in `refreshPerVendorFilaments()` used `ON CONFLICT(external_id)` without a `WHERE` predicate, which does not match the partial unique index `uniq_fp_external_id` (`WHERE external_id IS NOT NULL`, migration 137). SQLite threw on every row and the per-statement try/catch swallowed it, so the "per-vendor SMDB refresh" button and the 5-minute refresh tick imported zero filaments. Added the matching `WHERE external_id IS NOT NULL` predicate (`server/spoolmandb-modular.js`)
+- **Chamber temperature missing for printers without a `cavity` sensor** — `chamber_temper` was only populated from a `temperature_sensor` literally named `cavity` (or a Voron `heater_generic chamber` query). Printers exposing the chamber probe under other names (e.g. QIDI Plus 5's `Chamber_Thermal_Protection_Sensor`) never showed chamber temperature in the control panel. Chamber-sounding `temperature_sensor` names (`/chamber/i`) are now detected too (`server/moonraker-client.js`)
+
 ---
 
 ## v1.1.25 — Shop & CRM storefront (2026-07-12)
