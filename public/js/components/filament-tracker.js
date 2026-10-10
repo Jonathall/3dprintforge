@@ -115,6 +115,10 @@
   }
 
   function hexToRgb(hex) { if (!hex || hex.length < 6) return '#888'; return hex.startsWith('#') ? hex : `#${hex.substring(0, 6)}`; }
+  // Validate a hex color for <input type="color"> (needs exactly #rrggbb).
+  // Returns '#'+6hex when valid, otherwise the fallback. Prevents the browser
+  // from silently resetting invalid values to black (#000000).
+  function validColorHex(hex, fallback) { const h = String(hex || '').replace(/^#/, ''); return /^[0-9a-fA-F]{6}$/.test(h) ? '#' + h : fallback; }
   function hexToRgbColor(hex) { if (!hex || hex.length < 6) return 'rgb(128,128,128)'; const h = hex.replace('#',''); return `rgb(${parseInt(h.substring(0,2),16)},${parseInt(h.substring(2,4),16)},${parseInt(h.substring(4,6),16)})`; }
   function isLightColor(hex) { if (!hex || hex.length < 6) return false; const h = hex.replace('#',''); return (parseInt(h.substring(0,2),16)*299+parseInt(h.substring(2,4),16)*587+parseInt(h.substring(4,6),16)*114)/1000 > 160; }
   function printerName(id) { return window.printerState?.printerMeta?.[id]?.name || id || '--'; }
@@ -2886,7 +2890,7 @@
             <div class="form-group" style="margin-bottom:0">
               <label class="form-label">${t('filament.color', 'Color')}</label>
               <div style="display:flex;gap:6px;align-items:center">
-                <input type="color" class="form-input" id="sp-color-hex-${id}" value="${data?.color_hex_override || (data?.color_hex ? '#' + String(data.color_hex).replace(/^#/, '') : '#cccccc')}" style="width:42px;padding:2px;flex:0 0 auto;cursor:pointer">
+                <input type="color" class="form-input" id="sp-color-hex-${id}" value="${validColorHex(data?.color_hex_override || data?.color_hex, '#cccccc')}" style="width:42px;padding:2px;flex:0 0 auto;cursor:pointer">
                 <input class="form-input" id="sp-color-name-${id}" value="${data?.color_name_override || data?.color_name || ''}" placeholder="${t('filament.color_name_placeholder', 'White, Yellow, ...')}" style="flex:1 1 auto;min-width:0">
               </div>
             </div>
@@ -3584,7 +3588,7 @@
           <input class="form-input mt-xs" id="${pfx}-material-custom" style="display:none" placeholder="${t('filament.custom_type_placeholder')}">
         </div>
         <div class="form-group" style="width:90px"><label class="form-label">${t('filament.color')}</label><input class="form-input" id="${pfx}-color-name" value="${profile?.color_name || ''}"></div>
-        <div class="form-group" style="width:60px"><label class="form-label">${t('filament.color_hex')}</label><input type="color" class="form-input" id="${pfx}-color-hex" value="${/^[0-9a-fA-F]{6}$/.test(String(profile?.color_hex || '').replace(/^#/, '')) ? hexToRgb(profile.color_hex) : '#888888'}" style="padding:2px;height:32px"></div>
+        <div class="form-group" style="width:60px"><label class="form-label">${t('filament.color_hex')}</label><input type="color" class="form-input" id="${pfx}-color-hex" value="${validColorHex(profile?.color_hex, '#888888')}" style="padding:2px;height:32px"></div>
         <div class="form-group" style="width:80px"><label class="form-label">${t('filament.profile_spool_weight')}</label><input class="form-input" id="${pfx}-spool-weight" type="number" value="${profile?.spool_weight_g || 1000}"></div>
         <div class="form-group" style="width:70px"><label class="form-label">${t('filament.profile_density')}</label><input class="form-input" id="${pfx}-density" type="number" step="0.01" value="${profile?.density ?? 1.24}"></div>
         <div class="form-group" style="width:70px"><label class="form-label">${t('filament.profile_diameter')}</label><input class="form-input" id="${pfx}-diameter" type="number" step="0.01" value="${profile?.diameter ?? 1.75}"></div>
