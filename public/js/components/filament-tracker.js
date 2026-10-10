@@ -3584,7 +3584,7 @@
           <input class="form-input mt-xs" id="${pfx}-material-custom" style="display:none" placeholder="${t('filament.custom_type_placeholder')}">
         </div>
         <div class="form-group" style="width:90px"><label class="form-label">${t('filament.color')}</label><input class="form-input" id="${pfx}-color-name" value="${profile?.color_name || ''}"></div>
-        <div class="form-group" style="width:60px"><label class="form-label">${t('filament.color_hex')}</label><input type="color" class="form-input" id="${pfx}-color-hex" value="${profile?.color_hex ? hexToRgb(profile.color_hex) : '#888888'}" style="padding:2px;height:32px"></div>
+        <div class="form-group" style="width:60px"><label class="form-label">${t('filament.color_hex')}</label><input type="color" class="form-input" id="${pfx}-color-hex" value="${/^[0-9a-fA-F]{6}$/.test(String(profile?.color_hex || '').replace(/^#/, '')) ? hexToRgb(profile.color_hex) : '#888888'}" style="padding:2px;height:32px"></div>
         <div class="form-group" style="width:80px"><label class="form-label">${t('filament.profile_spool_weight')}</label><input class="form-input" id="${pfx}-spool-weight" type="number" value="${profile?.spool_weight_g || 1000}"></div>
         <div class="form-group" style="width:70px"><label class="form-label">${t('filament.profile_density')}</label><input class="form-input" id="${pfx}-density" type="number" step="0.01" value="${profile?.density ?? 1.24}"></div>
         <div class="form-group" style="width:70px"><label class="form-label">${t('filament.profile_diameter')}</label><input class="form-input" id="${pfx}-diameter" type="number" step="0.01" value="${profile?.diameter ?? 1.75}"></div>
