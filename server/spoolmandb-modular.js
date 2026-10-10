@@ -141,7 +141,7 @@ export async function refreshPerVendorFilaments({ vendorAllowList } = {}) {
      nozzle_temp_min, nozzle_temp_max, bed_temp_min, bed_temp_max, article_number,
      source, external_id, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'spoolmandb_per_vendor', ?, datetime('now'))
-    ON CONFLICT(external_id) DO UPDATE SET
+    ON CONFLICT(external_id) WHERE external_id IS NOT NULL DO UPDATE SET
       name = excluded.name,
       material = excluded.material,
       color_hex = excluded.color_hex,
