@@ -1132,7 +1132,7 @@ export class MoonrakerClient {
         if (name === 'mcu_temp' || name === 'raspberry_pi' || name === 'cavity') {
           if (!this.state._system_temps) this.state._system_temps = {};
           this.state._system_temps[name] = { temp: Math.round((ts.temperature || 0) * 10) / 10 };
-          if (name === 'cavity') this.state.chamber_temper = Math.round(ts.temperature || 0);
+          if (name === 'cavity' || /chamber/i.test(name)) this.state.chamber_temper = Math.round(ts.temperature || 0);
         }
       }
     }
